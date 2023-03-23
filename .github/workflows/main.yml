@@ -23,7 +23,7 @@ jobs:
       - name: Download ESP32 artifacts
         run: |
           wget ${{ env.URL_ESP32 }} -O ${{ env.FILENAME_ESP32 }}
-          unzip -o ${{ env.FILENAME_ESP32 }}
+          unzip -qo ${{ env.FILENAME_ESP32 }}
       - name: Setup Python 3.7
         uses: actions/setup-python@v4
         with:
