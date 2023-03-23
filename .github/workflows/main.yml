@@ -27,6 +27,17 @@ jobs:
         with:
           repository: espressif/esptool
           path: './esptool'
+      - name: Setup Pyserial
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade pyserial
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - name: Flash with esptool
         run: |
           ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin @flash_args
