@@ -10,6 +10,7 @@ env:
   URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.4/esp32-2.0.4.zip
   FILENAME_ESP32: esp32.zip
   BIN_BOOT_APP0: ./esp32-2.0.4/tools/partitions/boot_app0.bin
+  ELF_BOOTLOADER: ./esp32-2.0.4/tools/sdk/esp32/bin/bootloader_qio_80m.elf
   CSV_PARTITION: ./esp32-2.0.4/tools/partitions/minimal.csv
   BIN_ESPTOOL_GEN: ./esp32-2.0.4/tools/gen_esp32part.py
 
@@ -53,7 +54,7 @@ jobs:
           # gen partition.bin
           ${{ env.BIN_ESPTOOL_GEN }} -q ${{ env.CSV_PARTITION }} partitions.bin
           # gen bootloader.bin
-          ${{ env.BIN_ESPTOOL }} --chip esp32 elf2image --flash_mode dio --flash_freq 80m --flash_size 4MB -o bootloader.bin
+          ${{ env.BIN_ESPTOOL }} --chip esp32 elf2image --flash_mode dio --flash_freq 80m --flash_size 4MB -o bootloader.bin ${{ env.ELF_BOOTLOADER }}
           # gen firmware
           ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin \
             0x1000 bootloader.bin \
