@@ -10,7 +10,7 @@ env:
   URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.4/esp32-2.0.4.zip
   FILENAME_ESP32: esp32.zip
   BIN_BOOT_APP0: ./esp32-2.0.4/tools/partitions/boot_app0.bin
-  ELF_BOOTLOADER: ./esp32-2.0.4/tools/sdk/esp32/bin/bootloader_qio_80m.elf
+  ELF_BOOTLOADER: ./esp32-2.0.4/tools/sdk/esp32/bin/bootloader_qio_80m.bin
   CSV_PARTITION: ./esp32-2.0.4/tools/partitions/minimal.csv
   BIN_ESPTOOL_GEN: ./esp32-2.0.4/tools/gen_esp32part.py
 
