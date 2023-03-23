@@ -40,7 +40,7 @@ jobs:
         run: |
           wget -q ${{ env.FIRMWARE_URL }} -O ${{ env.FIRMWARE_BIN }}
           wget -q ${{ env.BOOTLOADER_URL }} -O ${{ env.BOOTLOADER_BIN }}
-          wget -q ${{ env.PARTITION_URL }} -O ${{ env.PARTITION_BIN }}
+          wget -q ${{ env.PARTITION_URL }} -O ${{ env.PARTITIONS_BIN }}
       - name: Checkout ESPTool
         uses: actions/checkout@v2
         with:
