@@ -62,4 +62,4 @@ jobs:
             
       - name: Flash bin artifact
         run: |
-          ./qemu/bin/qemu-system-xtensa -nographic -machine esp32 -drive file=flash_image.bin,if=mtd,format=raw
+          ./qemu/bin/qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=flash_image.bin,if=mtd,format=raw
