@@ -70,7 +70,7 @@ jobs:
             BOOT_APP0_ADDR=${{ github.event.inputs.BOOT_APP0_ADDR }}
             FIRMWARE_ADDR=${{ github.event.inputs.FIRMWARE_ADDR }}
             SPIFFS_ADDR=${{ github.event.inputs.SPIFFS_ADDR }}
-            DEFAULT_DEVICE=${{ github.event.inputs.DEVICE }}
+            DEVICE=${{ github.event.inputs.DEVICE }}
           else
             BASE_URL=https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz
             BOOTLOADER_ADDR=$DEFAULT_BOOTLOADER_ADDR
