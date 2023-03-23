@@ -1,47 +1,83 @@
 name: 'Test QEmu'
-on: push
-
-env:
-
-  # qemu executable
-  QEMU_BIN: ./qemu-git/build/qemu-system-xtensa
-
-  FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
-  PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
-  BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
-  SPIFFS_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
-  BOOT_APP0_URL: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
-  
-  BOOTLOADER_ADDR: "0x1000"
-  PARTITIONS_ADDR: "0x8000"
-  BOOT_APP0_ADDR: "0xe000"
-  FIRMWARE_ADDR: "0x10000"
-  SPIFFS_ADDR: "0x290000"
-  
-  FLASH_SIZE: 4MB
-
-  #FIRMWARE_BIN: firmware.bin
-  #BOOTLOADER_BIN: bootloader.bin
-  #PARTITIONS_BIN: partitions.bin
-  #BOOT_APP0_BIN: boot_app0.bin
-  #SPIFFS_BIN: spiffs.bin
-  #QEMU_IMAGE_BIN: flash_image.bin
-  
-  ESPTOOL: ./esptool/esptool.py
-  QEMU_TIMEOUT: 60 # seconds
+on: 
+  push:
+  workflow_dispatch:
+    inputs:
+      FIRMWARE_URL: 
+        description: "app URL"
+        default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
+      PARTITION_URL: 
+        description: "partition URL"
+        default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
+      BOOTLOADER_URL:
+        description: "bootloader URL"
+        default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
+      SPIFFS_URL:
+        description: "spiffs/littlefs URL"
+        default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
+      BOOT_APP0_URL:
+        description: "boot_app0 URL"
+        default: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
+      BOOTLOADER_ADDR:
+        description: "Bootloader Address"
+        default: "0x1000"
+      PARTITIONS_ADDR:
+        description: "Partitions Address"
+        default: "0x8000"
+      BOOT_APP0_ADDR:
+        description: "Boot App0 Address"
+        default: "0xe000"
+      FIRMWARE_ADDR:
+        description: "OTA0 Address"
+        default: "0x10000"
+      SPIFFS_ADDR:
+        description: "SPIFFS Address"
+        default: "0x290000"
+      FLASH_SIZE:
+        description: "Flash Size"
+        default: "4MB"
+      QEMU_TIMEOUT:
+        description: "QEmu timeout"
+        default: "60"
 
 jobs:
   qemu:
+
+    env:
+
+      # qemu executable
+      QEMU_BIN: ./qemu-git/build/qemu-system-xtensa
+      ESPTOOL: ./esptool/esptool.py
+
+      # TODO: move these as dispatchable values
+
+      #FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
+      FIRMWARE_URL: ${{ github.event.inputs.FIRMWARE_URL }}
+      PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
+      BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
+      SPIFFS_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
+      BOOT_APP0_URL: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
+
+      BOOTLOADER_ADDR: "0x1000"
+      PARTITIONS_ADDR: "0x8000"
+      BOOT_APP0_ADDR: "0xe000"
+      FIRMWARE_ADDR: "0x10000"
+      SPIFFS_ADDR: "0x290000"
+
+      FLASH_SIZE: 4MB
+      QEMU_TIMEOUT: 60 # seconds
+  
+  
     runs-on: ubuntu-latest
     steps:
 
       - name: 📥 Download bin artifact
         run: |
-          wget -q ${{ env.FIRMWARE_URL }} -O firmware.bin
+          wget -q ${{ env.FIRMWARE_URL }}   -O firmware.bin
           wget -q ${{ env.BOOTLOADER_URL }} -O bootloader.bin
-          wget -q ${{ env.PARTITION_URL }} -O partitions.bin
-          wget -q ${{ env.BOOT_APP0_URL }} -O boot_app0.bin
-          wget -q ${{ env.SPIFFS_URL }} -O spiffs.bin
+          wget -q ${{ env.PARTITION_URL }}  -O partitions.bin
+          wget -q ${{ env.BOOT_APP0_URL }}  -O boot_app0.bin
+          wget -q ${{ env.SPIFFS_URL }}     -O spiffs.bin
 
       - name: 🛅 Cache QEmu build
         uses: actions/cache@v3
