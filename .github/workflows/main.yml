@@ -50,10 +50,10 @@ jobs:
         uses: actions/cache@v3
         id: cache-qemu
         with:
-          path: './qemu-git/build'
-          key: ${{ runner.os }}-qemu-git-${{ hashFiles('**/qemu-system-xtensa') }}
+          path: './qemu-git'
+          key: ${{ runner.os }}-qemu-${{ hashFiles('**/qemu-system-xtensa') }}
           restore-keys: |
-            ${{ runner.os }}-qemu-git-
+            ${{ runner.os }}-qemu-
           
       - name: 📥 Checkout qemu-xtensa with flash size fix
         if: steps.cache-qemu.outputs.cache-hit != 'true'
@@ -106,7 +106,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade pyserial
                       
-      - name: Checkout esptool.py
+      - name: 📥 Checkout esptool.py
         uses: actions/checkout@v3
         with:
           repository: espressif/esptool
