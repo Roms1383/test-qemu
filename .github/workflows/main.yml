@@ -44,6 +44,32 @@ jobs:
         run: |
           wget -q ${{ env.QEMU_URL }} -O ${{ env.QEMU_ZIP }}
           tar -xf ${{ env.QEMU_ZIP }}
+          
+
+      - name: Checkout QEmu from espressif
+        uses: actions/checkout@v3
+        with:
+          repository: listout/qemu
+          path: './qemu-git'
+          branch: fix-flash-size
+          
+      - name: Compile QEmu
+        run: |
+          sudo apt-get update
+          sudo apt-get install ninja-build cmake
+          ninja --version
+          cmake --version
+          gcc --version
+          cd qemu-git
+          ./configure --target-list=xtensa-softmmu \
+              --enable-gcrypt \
+              --enable-debug --enable-sanitizers \
+              --disable-strip --disable-user \
+              --disable-capstone --disable-vnc \
+              --disable-sdl --disable-gtk
+          ninja -C build
+          ls build -la
+          
 
       - name: Download bin artifact
         run: |
