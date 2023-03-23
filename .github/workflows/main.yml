@@ -88,8 +88,9 @@ jobs:
             ${{ env.SPIFFS_ADDR }}     ${{ env.SPIFFS_BIN }}
             
       - name: Load firmware in QEmu
+        # qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=firmware.bin,if=mtd,format=raw
         run: |
-          (./qemu/bin/qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=${{ env.QEMU_IMAGE_BIN }},if=mtd,format=raw) &
-          sleep 60
+          (./qemu/bin/qemu-system-xtensa -nographic -machine esp32 -drive file=${{ env.QEMU_IMAGE_BIN }},if=mtd,format=raw) &
+          sleep 600
           killall qemu-system-xtensa || true
           
