@@ -10,7 +10,9 @@ jobs:
           wget https://github.com/espressif/qemu/releases/download/esp-develop-7.2.0-20230223/esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2 -O esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
           tar -xf esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
           ls -ahl
-          ./bin/qemu-system-xtensa -nographic \
+          ls -ahl ./qemu
+          ls -ahl ./qemu/bin
+          ./qemu/bin/qemu-system-xtensa -nographic \
             -machine esp32 \
             -drive file=flash_image.bin,if=mtd,format=raw
 
