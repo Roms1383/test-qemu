@@ -22,5 +22,5 @@ jobs:
         run: |
           ./qemu/bin/qemu-system-xtensa -nographic \
             -machine esp32 \
-            -drive file=${{ env.FILENAME_FIRMWARE }},if=mtd,format=raw
+            -drive file=flash_image.bin,if=mtd,format=raw
 
