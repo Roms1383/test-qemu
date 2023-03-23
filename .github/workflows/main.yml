@@ -63,7 +63,7 @@ jobs:
         run: |
           ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin \
             0x1000 ${{ env.BOOTLOADER_BIN }} \
-            0x8000 ${{ env.PARTITION_BIN }} \
+            0x8000 ${{ env.PARTITIONS_BIN }} \
             0xe000 ${{ env.BOOT_APP0_BIN }} \
             0x10000 ${{ env.FIRMWARE_BIN }}
             
