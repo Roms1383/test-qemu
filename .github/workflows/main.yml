@@ -4,6 +4,7 @@ on: push
 env:
   QEMU_URL: https://github.com/espressif/qemu/releases/download/esp-develop-7.2.0-20230223/esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
   QEMU_ZIP: esp-qemu-xtensa-softmmu.tar.bz2
+  QEMU_BIN: ./qemu/bin/qemu-system-xtensa
   
   #FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bin
   #PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.partitions.bin
@@ -51,7 +52,7 @@ jobs:
         with:
           repository: listout/qemu
           path: './qemu-git'
-          branch: fix-flash-size
+          ref: 'fix-flash-size'
           
       - name: Compile QEmu
         run: |
@@ -68,8 +69,8 @@ jobs:
               --disable-capstone --disable-vnc \
               --disable-sdl --disable-gtk
           ninja -C build
-          ls build -la
-          
+          cd ..
+          cp qemu-git/build/qemu-system-xtensa ${{ env.QEMU_BIN }}
 
       - name: Download bin artifact
         run: |
@@ -116,7 +117,7 @@ jobs:
       - name: Load firmware in QEmu
         # qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=firmware.bin,if=mtd,format=raw
         run: |
-          (./qemu/bin/qemu-system-xtensa -nographic -machine esp32 -drive file=${{ env.QEMU_IMAGE_BIN }},if=mtd,format=raw) &
+          (${{ env.QEMU_BIN }} -nographic -machine esp32 -drive file=${{ env.QEMU_IMAGE_BIN }},if=mtd,format=raw) &
           sleep 600
           killall qemu-system-xtensa || true
           
