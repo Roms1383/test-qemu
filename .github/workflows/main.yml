@@ -8,14 +8,15 @@ env:
   FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bin
   PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.partitions.bin
   BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bootloader.bin
+  BOOT_APP0_URL: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
   
-  ESP32_ARDUINO_URL: https://github.com/espressif/arduino-esp32/releases/download/2.0.7/esp32-2.0.7.zip
-  ESP32_ARDUINO_ZIP: esp32.zip
+  #ESP32_ARDUINO_URL: https://github.com/espressif/arduino-esp32/releases/download/2.0.7/esp32-2.0.7.zip
+  #ESP32_ARDUINO_ZIP: esp32.zip
 
   FIRMWARE_BIN: firmware.bin
   BOOTLOADER_BIN: bootloader.bin
   PARTITIONS_BIN: partitions.bin
-  BOOT_APP0_BIN: ./esp32-2.0.7/tools/partitions/boot_app0.bin
+  BOOT_APP0_BIN: boot_app0.bin
   
   BIN_ESPTOOL: ./esptool/esptool.py
 
@@ -30,28 +31,23 @@ jobs:
         run: |
           wget -q ${{ env.QEMU_URL }} -O ${{ env.QEMU_ZIP }}
           tar -xf ${{ env.QEMU_ZIP }}
-      - name: Download ESP32 artifacts
-        run: |
-          wget -q ${{ env.ESP32_ARDUINO_URL }} -O ${{ env.ESP32_ARDUINO_ZIP }}
-          unzip -qo ${{ env.ESP32_ARDUINO_ZIP }}
-      - name: Setup Python 3.7
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.7'
+#      - name: Download ESP32 artifacts
+#        run: |
+#          wget -q ${{ env.ESP32_ARDUINO_URL }} -O ${{ env.ESP32_ARDUINO_ZIP }}
+#          unzip -qo ${{ env.ESP32_ARDUINO_ZIP }}
+
       - name: Download bin artifact
         run: |
           wget -q ${{ env.FIRMWARE_URL }} -O ${{ env.FIRMWARE_BIN }}
           wget -q ${{ env.BOOTLOADER_URL }} -O ${{ env.BOOTLOADER_BIN }}
           wget -q ${{ env.PARTITION_URL }} -O ${{ env.PARTITIONS_BIN }}
-      - name: Checkout ESPTool
-        uses: actions/checkout@v2
+          wget -q ${{ env.BOOT_APP0_URL }} -O ${{ env.BOOT_APP0_BIN }}
+          
+      - name: Setup Python 3.7
+        uses: actions/setup-python@v4
         with:
-          repository: espressif/esptool
-          path: './esptool'
-      - name: Setup Pyserial
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade pyserial
+          python-version: '3.7'
+
       - name: Cache pip
         uses: actions/cache@v3
         with:
@@ -59,6 +55,18 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+          
+      - name: Setup Pyserial
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade pyserial
+                      
+      - name: Checkout ESPTool
+        uses: actions/checkout@v2
+        with:
+          repository: espressif/esptool
+          path: './esptool'
+          
       - name: Flash with ESPTool
         run: |
           ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin \
