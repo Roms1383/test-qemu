@@ -72,7 +72,7 @@ jobs:
           FIRMWARE_URL=$BASE_URL.ino.bin
           PARTITION_URL=$BASE_URL.ino.partitions.bin
           BOOTLOADER_URL=$BASE_URL.ino.bootloader.bin
-          SPIFFS_URL: $BASE_URL.spiffs.bin
+          SPIFFS_URL=$BASE_URL.spiffs.bin
           echo "FIRMWARE_URL=$FIRMWARE_URL" >> $GITHUB_ENV
           echo "PARTITION_URL=$PARTITION_URL" >> $GITHUB_ENV
           echo "BOOTLOADER_URL=$BOOTLOADER_URL" >> $GITHUB_ENV
