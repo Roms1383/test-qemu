@@ -2,21 +2,23 @@ name: 'Test QEmu'
 on: push
 
 env:
-  URL_QEMU: https://github.com/espressif/qemu/releases/download/esp-develop-7.2.0-20230223/esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
-  FILENAME_QEMU: esp-qemu-xtensa-softmmu.tar.bz2
+  QEMU_URL: https://github.com/espressif/qemu/releases/download/esp-develop-7.2.0-20230223/esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
+  QEMU_ZIP: esp-qemu-xtensa-softmmu.tar.bz2
+  
   FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bin
   PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.partitions.bin
   BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bootloader.bin
   
-  URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.7/esp32-2.0.7.zip
-  FILENAME_ESP32: esp32.zip
+  ESP32_ARDUINO_URL: https://github.com/espressif/arduino-esp32/releases/download/2.0.7/esp32-2.0.7.zip
+  ESP32_ARDUINO_ZIP: esp32.zip
 
   FIRMWARE_BIN: firmware.bin
   BOOTLOADER_BIN: bootloader.bin
   PARTITIONS_BIN: partitions.bin
-  BIN_ESPTOOL: ./esp32-2.0.7/tools/esptool_py/4.5/esptool.py
-
   BOOT_APP0_BIN: ./esp32-2.0.7/tools/partitions/boot_app0.bin
+  
+  BIN_ESPTOOL: ./esptool/esptool.py
+
   #CSV_PARTITION: ./esp32-2.0.7/tools/partitions/default.csv
   #BIN_ESPTOOL_GEN: ./esp32-2.0.7/tools/gen_esp32part.py
 
@@ -26,12 +28,12 @@ jobs:
     steps:
       - name: Download QEmu artifacts
         run: |
-          wget -q ${{ env.URL_QEMU }} -O ${{ env.FILENAME_QEMU }}
-          tar -xf ${{ env.FILENAME_QEMU }}
+          wget -q ${{ env.QEMU_URL }} -O ${{ env.QEMU_ZIP }}
+          tar -xf ${{ env.QEMU_ZIP }}
       - name: Download ESP32 artifacts
         run: |
-          wget -q ${{ env.URL_ESP32 }} -O ${{ env.FILENAME_ESP32 }}
-          unzip -qo ${{ env.FILENAME_ESP32 }}
+          wget -q ${{ env.ESP32_ARDUINO_URL }} -O ${{ env.ESP32_ARDUINO_ZIP }}
+          unzip -qo ${{ env.ESP32_ARDUINO_ZIP }}
       - name: Setup Python 3.7
         uses: actions/setup-python@v4
         with:
@@ -41,11 +43,11 @@ jobs:
           wget -q ${{ env.FIRMWARE_URL }} -O ${{ env.FIRMWARE_BIN }}
           wget -q ${{ env.BOOTLOADER_URL }} -O ${{ env.BOOTLOADER_BIN }}
           wget -q ${{ env.PARTITION_URL }} -O ${{ env.PARTITIONS_BIN }}
-#      - name: Checkout ESPTool
-#        uses: actions/checkout@v2
-#        with:
-#          repository: espressif/esptool
-#          path: './esptool'
+      - name: Checkout ESPTool
+        uses: actions/checkout@v2
+        with:
+          repository: espressif/esptool
+          path: './esptool'
       - name: Setup Pyserial
         run: |
           python -m pip install --upgrade pip
