@@ -7,6 +7,10 @@ env:
   URL_FIRMWARE: https://github.com/tobozo/M5Stack-SD-Updater/releases/download/v1.2.1/M5Core2-AppStore-2.0.4.bin
   FILENAME_FIRMWARE: firmware.bin
   BIN_ESPTOOL: ./esptool/esptool.py
+  URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.7/esp32-2.0.7.zip
+  FILENAME_ESP32: esp32.zip
+  BIN_BOOTLOADER: ./esp32-2.0.7/tools/partitions/boot_app0.bin
+  BIN_PARTITION: ./esp32-2.0.7/tools/partitions/default.bin
 
 jobs:
   qemu:
@@ -16,13 +20,18 @@ jobs:
         run: |
           wget ${{ env.URL_QEMU }} -O ${{ env.FILENAME_QEMU }}
           tar -xf ${{ env.FILENAME_QEMU }}
-      - uses: actions/setup-python@v4
+      - name: Download ESP32 artifacts
+        run: |
+          wget ${{ env.URL_ESP32 }} -O ${{ env.FILENAME_ESP32 }}
+          unzip -o ${{ env.FILENAME_ESP32 }}
+      - name: Setup Python 3.7
+        uses: actions/setup-python@v4
         with:
           python-version: '3.7'
       - name: Download bin artifact
         run: |
           wget ${{ env.URL_FIRMWARE }} -O ${{ env.FILENAME_FIRMWARE }}
-      - name: Checkout
+      - name: Checkout ESPTool
         uses: actions/checkout@v2
         with:
           repository: espressif/esptool
@@ -38,11 +47,11 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - name: Flash with esptool
+      - name: Flash with ESPTool
         run: |
-          ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin @flash_args
+          ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin 0x1000 ${{ env.BIN_BOOTLOADER }} 0x8000 ${{ env.BIN_PARTITION }} 0x10000 ${{ env.FILENAME_FIRMWARE }}
       - name: Flash bin artifact
         run: |
           ./qemu/bin/qemu-system-xtensa -nographic \
             -machine esp32 \
-            -drive file=${{ env.FILENAME_FIRMWARE }},if=mtd,format=raw
+            -drive file=flash_image.bin,if=mtd,format=raw
