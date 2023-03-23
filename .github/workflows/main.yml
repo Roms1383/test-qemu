@@ -26,6 +26,12 @@ jobs:
         run: |
           wget -q ${{ env.URL_ESP32 }} -O ${{ env.FILENAME_ESP32 }}
           unzip -qo ${{ env.FILENAME_ESP32 }}
+          ls ./esp32-2.0.4/
+          ls ./esp32-2.0.4/tools/
+          ls ./esp32-2.0.4/tools/partitions/
+          ls ./esp32-2.0.4/tools/sdk/
+          ls ./esp32-2.0.4/tools/sdk/esp32/
+          ls ./esp32-2.0.4/tools/sdk/esp32/bin/
       - name: Setup Python 3.7
         uses: actions/setup-python@v4
         with:
