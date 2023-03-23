@@ -22,7 +22,7 @@ on:
         default: "https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz"
       BOOT_APP0_URL:
         description: "boot_app0 URL"
-        default: ${{env.BOOT_APP0_URL}}
+        default: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
       BOOTLOADER_ADDR:
         description: "Bootloader Address"
         default: "0x1000"
