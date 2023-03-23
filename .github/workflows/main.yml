@@ -1,18 +1,26 @@
 name: 'Test QEmu'
 on: push
 
+env:
+  URL_QEMU: https://github.com/espressif/qemu/releases/download/esp-develop-7.2.0-20230223/esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
+  FILENAME_QEMU: esp-qemu-xtensa-softmmu.tar.bz2
+  URL_FIRMWARE: https://github.com/tobozo/M5Stack-SD-Updater/releases/download/v1.2.1/M5Core2-AppStore-2.0.4.bin
+  FILENAME_FIRMWARE: firmware.bin
+
 jobs:
   qemu:
     runs-on: ubuntu-latest
     steps:
       - name: Download QEmu artifacts
         run: |
-          wget https://github.com/espressif/qemu/releases/download/esp-develop-7.2.0-20230223/esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2 -O esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
-          tar -xf esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
-          ls -ahl
-          ls -ahl ./qemu
-          ls -ahl ./qemu/bin
+          wget ${{ env.URL_QEMU }} -O ${{ env.FILENAME_QEMU }}
+          tar -xf ${{ env.FILENAME_QEMU }}
+      - name: Download bin artifact
+        run: |
+          wget ${{ env.URL_FIRMWARE }} -O ${{ env.FILENAME_FIRMWARE }}
+      - name: Flash bin artifact
+        run: |
           ./qemu/bin/qemu-system-xtensa -nographic \
             -machine esp32 \
-            -drive file=flash_image.bin,if=mtd,format=raw
+            -drive file=${{ env.FILENAME_FIRMWARE }},if=mtd,format=raw
 
