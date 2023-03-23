@@ -2,19 +2,14 @@ name: 'Test QEmu'
 on: push
 
 env:
-  #QEMU_URL: https://github.com/espressif/qemu/releases/download/esp-develop-7.2.0-20230223/esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
-  #QEMU_ZIP: esp-qemu-xtensa-softmmu.tar.bz2
+
+  # qemu executable
   QEMU_BIN: ./qemu-git/build/qemu-system-xtensa
-  
-  #FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bin
-  #PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.partitions.bin
-  #BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bootloader.bin
-  
+
   FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
   PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
   BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
   SPIFFS_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
-  
   BOOT_APP0_URL: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
   
   BOOTLOADER_ADDR: "0x1000"
@@ -25,12 +20,12 @@ env:
   
   FLASH_SIZE: 4MB
 
-  FIRMWARE_BIN: firmware.bin
-  BOOTLOADER_BIN: bootloader.bin
-  PARTITIONS_BIN: partitions.bin
-  BOOT_APP0_BIN: boot_app0.bin
-  SPIFFS_BIN: spiffs.bin
-  QEMU_IMAGE_BIN: flash_image.bin
+  #FIRMWARE_BIN: firmware.bin
+  #BOOTLOADER_BIN: bootloader.bin
+  #PARTITIONS_BIN: partitions.bin
+  #BOOT_APP0_BIN: boot_app0.bin
+  #SPIFFS_BIN: spiffs.bin
+  #QEMU_IMAGE_BIN: flash_image.bin
   
   ESPTOOL: ./esptool/esptool.py
   QEMU_TIMEOUT: 60 # seconds
@@ -39,11 +34,14 @@ jobs:
   qemu:
     runs-on: ubuntu-latest
     steps:
-    
-#      - name: Download QEmu artifacts
-#        run: |
-#          wget -q ${{ env.QEMU_URL }} -O ${{ env.QEMU_ZIP }}
-#          tar -xf ${{ env.QEMU_ZIP }}
+
+      - name: 📥 Download bin artifact
+        run: |
+          wget -q ${{ env.FIRMWARE_URL }} -O firmware.bin
+          wget -q ${{ env.BOOTLOADER_URL }} -O bootloader.bin
+          wget -q ${{ env.PARTITION_URL }} -O partitions.bin
+          wget -q ${{ env.BOOT_APP0_URL }} -O boot_app0.bin
+          wget -q ${{ env.SPIFFS_URL }} -O spiffs.bin
 
       - name: 🛅 Cache QEmu build
         uses: actions/cache@v3
@@ -79,14 +77,6 @@ jobs:
               --disable-sdl --disable-gtk
           ninja -C build
 
-      - name: 📥 Download bin artifact
-        run: |
-          wget -q ${{ env.FIRMWARE_URL }} -O ${{ env.FIRMWARE_BIN }}
-          wget -q ${{ env.BOOTLOADER_URL }} -O ${{ env.BOOTLOADER_BIN }}
-          wget -q ${{ env.PARTITION_URL }} -O ${{ env.PARTITIONS_BIN }}
-          wget -q ${{ env.BOOT_APP0_URL }} -O ${{ env.BOOT_APP0_BIN }}
-          wget -q ${{ env.SPIFFS_URL }} -O ${{ env.SPIFFS_BIN }}
-          
       - name: 🪡 Setup Python 3.7
         uses: actions/setup-python@v4
         with:
@@ -113,17 +103,17 @@ jobs:
    
       - name: 🏭 Create firmware for QEmu
         run: |
-          ${{ env.ESPTOOL }} --chip esp32 merge_bin --fill-flash-size ${{ env.FLASH_SIZE }} -o ${{ env.QEMU_IMAGE_BIN }} \
-            ${{ env.BOOTLOADER_ADDR }} ${{ env.BOOTLOADER_BIN }} \
-            ${{ env.PARTITIONS_ADDR }} ${{ env.PARTITIONS_BIN }} \
-            ${{ env.BOOT_APP0_ADDR }}  ${{ env.BOOT_APP0_BIN }} \
-            ${{ env.FIRMWARE_ADDR }}   ${{ env.FIRMWARE_BIN }} \
-            ${{ env.SPIFFS_ADDR }}     ${{ env.SPIFFS_BIN }}
+          ${{ env.ESPTOOL }} --chip esp32 merge_bin --fill-flash-size ${{ env.FLASH_SIZE }} -o flash_image.bin \
+            ${{ env.BOOTLOADER_ADDR }} bootloader.bin \
+            ${{ env.PARTITIONS_ADDR }} partitions.bin \
+            ${{ env.BOOT_APP0_ADDR }}  boot_app0.bin \
+            ${{ env.FIRMWARE_ADDR }}   firmware.bin \
+            ${{ env.SPIFFS_ADDR }}     spiffs.bin
             
       - name: 🕹️ Load firmware in QEmu
         # qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=firmware.bin,if=mtd,format=raw
         run: |
-          (${{ env.QEMU_BIN }} -nographic -machine esp32 -drive file=${{ env.QEMU_IMAGE_BIN }},if=mtd,format=raw) &
+          (${{ env.QEMU_BIN }} -nographic -machine esp32 -drive file=flash_image.bin,if=mtd,format=raw) &
           sleep ${{ env.QEMU_TIMEOUT }}
           killall qemu-system-xtensa || true
           
