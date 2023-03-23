@@ -5,12 +5,12 @@ env:
   URL_QEMU: https://github.com/espressif/qemu/releases/download/esp-develop-7.2.0-20230223/esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
   FILENAME_QEMU: esp-qemu-xtensa-softmmu.tar.bz2
   URL_FIRMWARE: https://github.com/tobozo/M5Stack-SD-Updater/releases/download/v1.2.1/M5Core2-AppStore-2.0.4.bin
-  FILENAME_FIRMWARE: firmware.bin
+  FIRMWARE_BIN: firmware.bin
   BIN_ESPTOOL: ./esptool/esptool.py
   URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.4/esp32-2.0.4.zip
   FILENAME_ESP32: esp32.zip
-  BIN_BOOT_APP0: ./esp32-2.0.4/tools/partitions/boot_app0.bin
-  ELF_BOOTLOADER: ./esp32-2.0.4/tools/sdk/esp32/bin/bootloader_qio_80m.bin
+  BOOT_APP0_BIN: ./esp32-2.0.4/tools/partitions/boot_app0.bin
+  BOOTLOADER_BIN: ./esp32-2.0.4/tools/sdk/esp32/bin/bootloader_qio_80m.bin
   CSV_PARTITION: ./esp32-2.0.4/tools/partitions/minimal.csv
   BIN_ESPTOOL_GEN: ./esp32-2.0.4/tools/gen_esp32part.py
 
@@ -26,19 +26,13 @@ jobs:
         run: |
           wget -q ${{ env.URL_ESP32 }} -O ${{ env.FILENAME_ESP32 }}
           unzip -qo ${{ env.FILENAME_ESP32 }}
-          ls ./esp32-2.0.4/
-          ls ./esp32-2.0.4/tools/
-          ls ./esp32-2.0.4/tools/partitions/
-          ls ./esp32-2.0.4/tools/sdk/
-          ls ./esp32-2.0.4/tools/sdk/esp32/
-          ls ./esp32-2.0.4/tools/sdk/esp32/bin/
       - name: Setup Python 3.7
         uses: actions/setup-python@v4
         with:
           python-version: '3.7'
       - name: Download bin artifact
         run: |
-          wget -q ${{ env.URL_FIRMWARE }} -O ${{ env.FILENAME_FIRMWARE }}
+          wget -q ${{ env.URL_FIRMWARE }} -O ${{ env.FIRMWARE_BIN }}
       - name: Checkout ESPTool
         uses: actions/checkout@v2
         with:
@@ -59,14 +53,12 @@ jobs:
         run: |
           # gen partition.bin
           ${{ env.BIN_ESPTOOL_GEN }} -q ${{ env.CSV_PARTITION }} partitions.bin
-          # gen bootloader.bin
-          ${{ env.BIN_ESPTOOL }} --chip esp32 elf2image --flash_mode dio --flash_freq 80m --flash_size 4MB -o bootloader.bin ${{ env.ELF_BOOTLOADER }}
           # gen firmware
           ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin \
-            0x1000 bootloader.bin \
+            0x1000 ${{ env.BOOTLOADER_BIN }} \
             0x8000 partitions.bin \
-            0xe000 ${{ env.BIN_BOOT_APP0 }} \
-            0x10000 ${{ env.FILENAME_FIRMWARE }}
+            0xe000 ${{ env.BOOT_APP0_BIN }} \
+            0x10000 ${{ env.FIRMWARE_BIN }}
             
       - name: Flash bin artifact
         run: |
