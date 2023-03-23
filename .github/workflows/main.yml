@@ -9,7 +9,7 @@ env:
   BIN_ESPTOOL: ./esptool/esptool.py
   URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.4/esp32-2.0.4.zip
   FILENAME_ESP32: esp32.zip
-  BIN_BOOTLOADER: ./esp32-2.0.4/tools/partitions/boot_app0.bin
+  BIN_BOOT_APP0: ./esp32-2.0.4/tools/partitions/boot_app0.bin
   CSV_PARTITION: ./esp32-2.0.4/tools/partitions/minimal.csv
   BIN_ESPTOOL_GEN: ./esp32-2.0.4/tools/gen_esp32part.py
 
@@ -50,11 +50,17 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Flash with ESPTool
         run: |
+          # gen partition.bin
           ${{ env.BIN_ESPTOOL_GEN }} -q ${{ env.CSV_PARTITION }} partitions.bin
-          ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin 0x1000 ${{ env.BIN_BOOTLOADER }} 0x8000 partitions.bin 0x10000 ${{ env.FILENAME_FIRMWARE }}
+          # gen bootloader.bin
+          ${{ env.BIN_ESPTOOL }} --chip esp32 elf2image --flash_mode dio --flash_freq 80m --flash_size 4MB -o bootloader.bin
+          # gen firmware
+          ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin \
+            0x1000 bootloader.bin \
+            0x8000 partitions.bin \
+            0xe000 ${{ env.BIN_BOOT_APP0 }} \
+            0x10000 ${{ env.FILENAME_FIRMWARE }}
+            
       - name: Flash bin artifact
         run: |
-          ./qemu/bin/qemu-system-xtensa -nographic \
-            -machine esp32 \
-            -drive file=flash_image.bin,if=mtd,format=raw \
-            -serial tcp::5555,server,nowait
+          ./qemu/bin/qemu-system-xtensa -nographic -machine esp32 -drive file=flash_image.bin,if=mtd,format=raw
