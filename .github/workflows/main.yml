@@ -7,10 +7,10 @@ env:
   URL_FIRMWARE: https://github.com/tobozo/M5Stack-SD-Updater/releases/download/v1.2.1/M5Core2-AppStore-2.0.4.bin
   FILENAME_FIRMWARE: firmware.bin
   BIN_ESPTOOL: ./esptool/esptool.py
-  URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.7/esp32-2.0.7.zip
+  URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.4/esp32-2.0.4.zip
   FILENAME_ESP32: esp32.zip
-  BIN_BOOTLOADER: ./esp32-2.0.7/tools/partitions/boot_app0.bin
-  BIN_PARTITION: ./esp32-2.0.7/tools/partitions/default.bin
+  BIN_BOOTLOADER: ./esp32-2.0.4/tools/partitions/boot_app0.bin
+  BIN_PARTITION: ./esp32-2.0.4/tools/partitions/default.bin
 
 jobs:
   qemu:
