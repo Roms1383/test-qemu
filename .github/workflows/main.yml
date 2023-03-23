@@ -76,7 +76,7 @@ jobs:
           echo "FIRMWARE_URL=$FIRMWARE_URL" >> $GITHUB_ENV
           echo "PARTITION_URL=$PARTITION_URL" >> $GITHUB_ENV
           echo "BOOTLOADER_URL=$BOOTLOADER_URL" >> $GITHUB_ENV
-          echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
+          echo "SPIFFS_URL=$PIFFS_URL" >> $GITHUB_ENV
 
       - name: 📥 Download bin artifact
         run: |
