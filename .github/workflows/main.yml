@@ -14,7 +14,7 @@ env:
   FIRMWARE_BIN: firmware.bin
   BOOTLOADER_BIN: bootloader.bin
   PARTITIONS_BIN: partitions.bin
-  BIN_ESPTOOL: ./esp32-2.0.7/tools/esptool.py
+  BIN_ESPTOOL: ./esp32-2.0.7/tools/esptool_py/4.5/esptool.py
 
   BOOT_APP0_BIN: ./esp32-2.0.7/tools/partitions/boot_app0.bin
   #CSV_PARTITION: ./esp32-2.0.7/tools/partitions/default.csv
@@ -41,11 +41,11 @@ jobs:
           wget -q ${{ env.FIRMWARE_URL }} -O ${{ env.FIRMWARE_BIN }}
           wget -q ${{ env.BOOTLOADER_URL }} -O ${{ env.BOOTLOADER_BIN }}
           wget -q ${{ env.PARTITION_URL }} -O ${{ env.PARTITIONS_BIN }}
-      - name: Checkout ESPTool
-        uses: actions/checkout@v2
-        with:
-          repository: espressif/esptool
-          path: './esptool'
+#      - name: Checkout ESPTool
+#        uses: actions/checkout@v2
+#        with:
+#          repository: espressif/esptool
+#          path: './esptool'
       - name: Setup Pyserial
         run: |
           python -m pip install --upgrade pip
