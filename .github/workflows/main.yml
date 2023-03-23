@@ -3,18 +3,21 @@ on:
   push:
   workflow_dispatch:
     inputs:
-      FIRMWARE_URL: 
-        description: "app URL"
-        default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
-      PARTITION_URL: 
-        description: "partition URL"
-        default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
-      BOOTLOADER_URL:
-        description: "bootloader URL"
-        default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
-      SPIFFS_URL:
-        description: "spiffs/littlefs URL"
-        default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
+      BASE_URL: 
+        description: "Base URL"
+        default: "https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz"
+      #FIRMWARE_URL: 
+      #  description: "app URL"
+      #  default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
+      #PARTITION_URL: 
+      #  description: "partition URL"
+      #  default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
+      #BOOTLOADER_URL:
+      #  description: "bootloader URL"
+      #  default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
+      #SPIFFS_URL:
+      #  description: "spiffs/littlefs URL"
+      #  default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
       BOOT_APP0_URL:
         description: "boot_app0 URL"
         default: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
@@ -51,8 +54,8 @@ jobs:
 
       # TODO: move these as dispatchable values
 
-      #FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
-      FIRMWARE_URL: ${{ github.event.inputs.FIRMWARE_URL }}
+      FIRMWARE_URL: ${{ github.event.inputs.BASE_URL }}.ino.bin
+      #FIRMWARE_URL: ${{ github.event.inputs.BASE_URL }}
       PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
       BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
       SPIFFS_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
