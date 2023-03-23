@@ -20,7 +20,7 @@ jobs:
       - name: Download esptool
         run: |
           wget ${{ env.URL_ESPTOOL }} -O ${{ env.FILENAME_ESPTOOL }}
-          tar -xf ${{ env.FILENAME_ESPTOOL }}
+          unzip ${{ env.FILENAME_ESPTOOL }}
       - name: Download bin artifact
         run: |
           wget ${{ env.URL_FIRMWARE }} -O ${{ env.FILENAME_FIRMWARE }}
