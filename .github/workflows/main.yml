@@ -17,6 +17,15 @@ on:
   push:
   workflow_dispatch:
     inputs:
+      DEVICE:
+        type: choice
+        description: Device
+        default: esp32
+        options:
+        - esp32
+        - esp32s2
+        - esp32s3
+        - esp32c3
       BASE_URL: 
         description: "URL Prefix for binaries"
         default: "https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz"
