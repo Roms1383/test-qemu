@@ -6,7 +6,8 @@ env:
   FILENAME_QEMU: esp-qemu-xtensa-softmmu.tar.bz2
   URL_FIRMWARE: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bin
   FIRMWARE_BIN: firmware.bin
-  BIN_ESPTOOL: ./esptool/esptool.py
+  #BIN_ESPTOOL: ./esptool/esptool.py
+  BIN_ESPTOOL: ./esp32-2.0.4/tools/esptool.py
   URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.4/esp32-2.0.4.zip
   FILENAME_ESP32: esp32.zip
   BOOT_APP0_BIN: ./esp32-2.0.4/tools/partitions/boot_app0.bin
