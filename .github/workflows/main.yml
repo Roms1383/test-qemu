@@ -6,6 +6,8 @@ env:
   FILENAME_QEMU: esp-qemu-xtensa-softmmu.tar.bz2
   URL_FIRMWARE: https://github.com/tobozo/M5Stack-SD-Updater/releases/download/v1.2.1/M5Core2-AppStore-2.0.4.bin
   FILENAME_FIRMWARE: firmware.bin
+  URL_ESPTOOL: https://github.com/espressif/esptool/releases/download/v4.5.1/esptool-v4.5.1-linux-amd64.zip
+  FILENAME_ESPTOOL: esptool.zip
 
 jobs:
   qemu:
@@ -15,9 +17,16 @@ jobs:
         run: |
           wget ${{ env.URL_QEMU }} -O ${{ env.FILENAME_QEMU }}
           tar -xf ${{ env.FILENAME_QEMU }}
+      - name: Download esptool
+        run: |
+          wget ${{ env.URL_ESPTOOL }} -O ${{ env.FILENAME_ESPTOOL }}
+          tar -xf ${{ env.FILENAME_ESPTOOL }}
       - name: Download bin artifact
         run: |
           wget ${{ env.URL_FIRMWARE }} -O ${{ env.FILENAME_FIRMWARE }}
+      - name: Flash with esptool
+        run: |
+          esptool.py --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin @flash_args
       - name: Flash bin artifact
         run: |
           ./qemu/bin/qemu-system-xtensa -nographic \
