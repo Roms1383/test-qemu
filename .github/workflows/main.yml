@@ -13,7 +13,7 @@ env:
   FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
   PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
   BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
-  SPIFFS_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.spiffs.bin
+  SPIFFS_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
   
   BOOT_APP0_URL: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
 
