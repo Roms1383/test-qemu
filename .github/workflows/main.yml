@@ -4,20 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       BASE_URL: 
-        description: "Base URL"
+        description: "URL Prefix for binaries"
         default: "https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz"
-      #FIRMWARE_URL: 
-      #  description: "app URL"
-      #  default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
-      #PARTITION_URL: 
-      #  description: "partition URL"
-      #  default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
-      #BOOTLOADER_URL:
-      #  description: "bootloader URL"
-      #  default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
-      #SPIFFS_URL:
-      #  description: "spiffs/littlefs URL"
-      #  default: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
       BOOT_APP0_URL:
         description: "boot_app0 URL"
         default: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
@@ -54,11 +42,11 @@ jobs:
 
       # TODO: move these as dispatchable values
 
-      FIRMWARE_URL: ${{ github.event.inputs.BASE_URL }}.ino.bin
-      #FIRMWARE_URL: ${{ github.event.inputs.BASE_URL }}
-      PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
-      BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
-      SPIFFS_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
+      #FIRMWARE_URL: ${{ github.event.inputs.BASE_URL }}.ino.bin
+      #FIRMWARE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bin
+      #PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.partitions.bin
+      #BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.ino.bootloader.bin
+      #SPIFFS_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz.spiffs.bin
       BOOT_APP0_URL: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
 
       BOOTLOADER_ADDR: "0x1000"
@@ -73,6 +61,22 @@ jobs:
   
     runs-on: ubuntu-latest
     steps:
+
+      - name: Guess Context
+        run: |
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then
+            BASE_URL=${{ github.event.inputs.BASE_URL }}
+          else
+            BASE_URL=https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz
+          fi
+          FIRMWARE_URL=$BASE_URL.ino.bin
+          PARTITION_URL=$BASE_URL.ino.partitions.bin
+          BOOTLOADER_URL=$BASE_URL.ino.bootloader.bin
+          SPIFFS_URL: $BASE_URL.spiffs.bin
+          echo "FIRMWARE_URL=$FIRMWARE_URL" >> $GITHUB_ENV
+          echo "PARTITION_URL=$PARTITION_URL" >> $GITHUB_ENV
+          echo "BOOTLOADER_URL=$BOOTLOADER_URL" >> $GITHUB_ENV
+          echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
 
       - name: 📥 Download bin artifact
         run: |
