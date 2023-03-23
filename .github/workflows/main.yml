@@ -10,6 +10,7 @@ env:
   DEFAULT_BOOT_APP0_ADDR: "0xe000"
   DEFAULT_FIRMWARE_ADDR: "0x10000"
   DEFAULT_SPIFFS_ADDR: "0x290000"
+  DEFAULT_DEVICE: esp32
   FLASH_SIZE: 4MB
   QEMU_TIMEOUT: 60 # seconds
 
@@ -69,6 +70,7 @@ jobs:
             BOOT_APP0_ADDR=${{ github.event.inputs.BOOT_APP0_ADDR }}
             FIRMWARE_ADDR=${{ github.event.inputs.FIRMWARE_ADDR }}
             SPIFFS_ADDR=${{ github.event.inputs.SPIFFS_ADDR }}
+            DEFAULT_DEVICE=${{ github.event.inputs.DEVICE }}
           else
             BASE_URL=https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz
             BOOTLOADER_ADDR=$DEFAULT_BOOTLOADER_ADDR
@@ -76,6 +78,7 @@ jobs:
             BOOT_APP0_ADDR=$DEFAULT_BOOT_APP0_ADDR
             FIRMWARE_ADDR=$DEFAULT_FIRMWARE_ADDR
             SPIFFS_ADDR=$DEFAULT_SPIFFS_ADDR
+            DEVICE=$DEFAULT_DEVICE
           fi
           
           FIRMWARE_URL=$BASE_URL.ino.bin
@@ -83,6 +86,7 @@ jobs:
           BOOTLOADER_URL=$BASE_URL.ino.bootloader.bin
           SPIFFS_URL=$BASE_URL.spiffs.bin
         
+          echo "DEVICE=$DEVICE" >> $GITHUB_ENV
           echo "BOOTLOADER_ADDR=$BOOTLOADER_ADDR" >> $GITHUB_ENV
           echo "PARTITIONS_ADDR=$PARTITIONS_ADDR" >> $GITHUB_ENV
           echo "BOOT_APP0_ADDR=$BOOT_APP0_ADDR" >> $GITHUB_ENV
@@ -161,7 +165,7 @@ jobs:
    
       - name: 🏭 Create firmware for QEmu
         run: |
-          ${{ env.ESPTOOL }} --chip esp32 merge_bin --fill-flash-size ${{ env.FLASH_SIZE }} -o flash_image.bin \
+          ${{ env.ESPTOOL }} --chip ${{ env.DEVICE }} merge_bin --fill-flash-size ${{ env.FLASH_SIZE }} -o flash_image.bin \
             ${{ env.BOOTLOADER_ADDR }} bootloader.bin \
             ${{ env.PARTITIONS_ADDR }} partitions.bin \
             ${{ env.BOOT_APP0_ADDR }}  boot_app0.bin \
@@ -171,7 +175,7 @@ jobs:
       - name: 🕹️ Load firmware in QEmu
         # qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=firmware.bin,if=mtd,format=raw
         run: |
-          (${{ env.QEMU_BIN }} -nographic -machine esp32 -drive file=flash_image.bin,if=mtd,format=raw) &
+          (${{ env.QEMU_BIN }} -nographic -machine ${{ env.DEVICE }} -drive file=flash_image.bin,if=mtd,format=raw) &
           sleep ${{ env.QEMU_TIMEOUT }}
           killall qemu-system-xtensa || true
           
