@@ -90,6 +90,6 @@ jobs:
       - name: Load firmware in QEmu
         run: |
           (./qemu/bin/qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=${{ env.QEMU_IMAGE_BIN }},if=mtd,format=raw) &
-          sleep 5
+          sleep 60
           killall qemu-system-xtensa || true
           
