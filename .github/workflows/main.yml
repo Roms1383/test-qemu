@@ -4,14 +4,14 @@ on: push
 env:
   URL_QEMU: https://github.com/espressif/qemu/releases/download/esp-develop-7.2.0-20230223/esp-qemu-xtensa-softmmu-develop_7.2.0_20230223-x86_64-linux-gnu.tar.bz2
   FILENAME_QEMU: esp-qemu-xtensa-softmmu.tar.bz2
-  URL_FIRMWARE: https://github.com/tobozo/M5Stack-SD-Updater/releases/download/v1.2.1/M5Core2-AppStore-2.0.4.bin
+  URL_FIRMWARE: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bin
   FIRMWARE_BIN: firmware.bin
   BIN_ESPTOOL: ./esptool/esptool.py
   URL_ESP32: https://github.com/espressif/arduino-esp32/releases/download/2.0.4/esp32-2.0.4.zip
   FILENAME_ESP32: esp32.zip
   BOOT_APP0_BIN: ./esp32-2.0.4/tools/partitions/boot_app0.bin
   BOOTLOADER_BIN: ./esp32-2.0.4/tools/sdk/esp32/bin/bootloader_qio_80m.bin
-  CSV_PARTITION: ./esp32-2.0.4/tools/partitions/minimal.csv
+  CSV_PARTITION: ./esp32-2.0.4/tools/partitions/default.csv
   BIN_ESPTOOL_GEN: ./esp32-2.0.4/tools/gen_esp32part.py
 
 jobs:
