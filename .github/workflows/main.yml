@@ -46,13 +46,6 @@ jobs:
 #          wget -q ${{ env.QEMU_URL }} -O ${{ env.QEMU_ZIP }}
 #          tar -xf ${{ env.QEMU_ZIP }}
 
-      - name: Checkout qemu-xtensa with flash size fix
-        uses: actions/checkout@v3
-        with:
-          repository: listout/qemu
-          path: './qemu-git'
-          ref: 'fix-flash-size'
-
       - name: Cache QEmu build
         uses: actions/cache@v3
         id: cache-qemu
@@ -61,6 +54,14 @@ jobs:
           key: ${{ runner.os }}-qemu-git-${{ hashFiles('**/qemu-system-xtensa') }}
           restore-keys: |
             ${{ runner.os }}-qemu-git-
+          
+      - name: Checkout qemu-xtensa with flash size fix
+        if: steps.cache-qemu.outputs.cache-hit != 'true'
+        uses: actions/checkout@v3
+        with:
+          repository: listout/qemu
+          path: './qemu-git'
+          ref: 'fix-flash-size'
           
       - name: Build QEmu
         if: steps.cache-qemu.outputs.cache-hit != 'true'
