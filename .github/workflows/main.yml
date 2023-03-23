@@ -19,11 +19,11 @@ jobs:
     steps:
       - name: Download QEmu artifacts
         run: |
-          wget ${{ env.URL_QEMU }} -O ${{ env.FILENAME_QEMU }}
+          wget -q ${{ env.URL_QEMU }} -O ${{ env.FILENAME_QEMU }}
           tar -xf ${{ env.FILENAME_QEMU }}
       - name: Download ESP32 artifacts
         run: |
-          wget ${{ env.URL_ESP32 }} -O ${{ env.FILENAME_ESP32 }}
+          wget -q ${{ env.URL_ESP32 }} -O ${{ env.FILENAME_ESP32 }}
           unzip -qo ${{ env.FILENAME_ESP32 }}
       - name: Setup Python 3.7
         uses: actions/setup-python@v4
@@ -31,7 +31,7 @@ jobs:
           python-version: '3.7'
       - name: Download bin artifact
         run: |
-          wget ${{ env.URL_FIRMWARE }} -O ${{ env.FILENAME_FIRMWARE }}
+          wget -q ${{ env.URL_FIRMWARE }} -O ${{ env.FILENAME_FIRMWARE }}
       - name: Checkout ESPTool
         uses: actions/checkout@v2
         with:
