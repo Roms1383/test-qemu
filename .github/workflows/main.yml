@@ -9,19 +9,14 @@ env:
   PARTITION_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.partitions.bin
   BOOTLOADER_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/HelloWorld.ino.bootloader.bin
   BOOT_APP0_URL: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
-  
-  #ESP32_ARDUINO_URL: https://github.com/espressif/arduino-esp32/releases/download/2.0.7/esp32-2.0.7.zip
-  #ESP32_ARDUINO_ZIP: esp32.zip
 
   FIRMWARE_BIN: firmware.bin
   BOOTLOADER_BIN: bootloader.bin
   PARTITIONS_BIN: partitions.bin
   BOOT_APP0_BIN: boot_app0.bin
+  QEMU_IMAGE_BIN: flash_image.bin
   
-  BIN_ESPTOOL: ./esptool/esptool.py
-
-  #CSV_PARTITION: ./esp32-2.0.7/tools/partitions/default.csv
-  #BIN_ESPTOOL_GEN: ./esp32-2.0.7/tools/gen_esp32part.py
+  ESPTOOL: ./esptool/esptool.py
 
 jobs:
   qemu:
@@ -62,14 +57,14 @@ jobs:
           pip install --upgrade pyserial
                       
       - name: Checkout ESPTool
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: espressif/esptool
           path: './esptool'
           
       - name: Flash with ESPTool
         run: |
-          ${{ env.BIN_ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o flash_image.bin \
+          ${{ env.ESPTOOL }} --chip esp32 merge_bin --fill-flash-size 4MB -o ${{ env.QEMU_IMAGE_BIN }} \
             0x1000 ${{ env.BOOTLOADER_BIN }} \
             0x8000 ${{ env.PARTITIONS_BIN }} \
             0xe000 ${{ env.BOOT_APP0_BIN }} \
@@ -77,7 +72,7 @@ jobs:
             
       - name: Flash bin artifact
         run: |
-          (./qemu/bin/qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=flash_image.bin,if=mtd,format=raw) &
+          (./qemu/bin/qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=${{ env.QEMU_IMAGE_BIN }},if=mtd,format=raw) &
           sleep 5
           killall qemu-system-xtensa || true
           
