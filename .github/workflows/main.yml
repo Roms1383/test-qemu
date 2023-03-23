@@ -64,5 +64,5 @@ jobs:
         run: |
           (./qemu/bin/qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=flash_image.bin,if=mtd,format=raw) &
           sleep 5
-          killall qemu-system-xtensa
+          killall qemu-system-xtensa || true
           
