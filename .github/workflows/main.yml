@@ -42,26 +42,14 @@ on:
         - "4"
         - "8"
         - "16"
-      BASE_URL: 
-        description: "URL Prefix for binaries"
-        default: ""
-      BOOT_APP0_URL:
-        description: "boot_app0 URL"
-        default: ""
-      BOOTLOADER_ADDR:
-        description: "Bootloader Address"
-        default: "0x1000"
-      PARTITIONS_ADDR:
-        description: "Partitions Address"
-        default: "0x8000"
       BOOT_APP0_ADDR:
-        description: "Boot App0 Address"
+        description: "otadata Address"
         default: "0xe000"
       FIRMWARE_ADDR:
-        description: "OTA0 Address"
+        description: "app0 Address"
         default: "0x10000"
       SPIFFS_ADDR:
-        description: "SPIFFS Address"
+        description: "spiffs Address"
         default: "0x290000"
       QEMU_TIMEOUT:
         description: "QEmu timeout"
@@ -133,9 +121,6 @@ jobs:
       - name: Guess Context
         run: |
           if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then
-            BASE_URL=${{ github.event.inputs.BASE_URL }}
-            BOOTLOADER_ADDR=${{ github.event.inputs.BOOTLOADER_ADDR }}
-            PARTITIONS_ADDR=${{ github.event.inputs.PARTITIONS_ADDR }}
             DEVICE=${{ github.event.inputs.DEVICE }}
             FLASH_SIZE=${{ github.event.inputs.FLASH_SIZE }}
             cat ${{ env.BUILD_ARTIFACT_FOLDER }}/partitions.csv
@@ -149,19 +134,16 @@ jobs:
                 otadata)  BOOT_APP0_ADDR="${csv_columns[3]}" ;;
                 app0)     FIRMWARE_ADDR="${csv_columns[3]}"  ;;
                 spiffs)   SPIFFS_ADDR="${csv_columns[3]}"    ;;
-                coredump) COREDUMP_ADDR="${csv_columns[3]}"  ;;
                 *) echo "Ignoring ${csv_columns[0]}:${csv_columns[3]}" ;;
               esac
             done
             ( set -o posix ; set ) | grep _ADDR
             IFS=$OLD_IFS
-            
           else
-            BASE_URL=${{ env.DEFAULT_BASE_URL }}
-            FIRMWARE_URL=$BASE_URL.ino.bin
-            PARTITION_URL=$BASE_URL.ino.partitions.bin
-            BOOTLOADER_URL=$BASE_URL.ino.bootloader.bin
-            SPIFFS_URL=$BASE_URL.spiffs.bin
+            PARTITION_URL=${{ env.DEFAULT_BASE_URL }}.ino.partitions.bin
+            BOOTLOADER_URL=${{ env.DEFAULT_BASE_URL }}.ino.bootloader.bin
+            FIRMWARE_URL=${{ env.DEFAULT_BASE_URL }}.ino.bin
+            SPIFFS_URL=${{ env.DEFAULT_BASE_URL }}.spiffs.bin
             BOOTLOADER_ADDR=${{ env.DEFAULT_BOOTLOADER_ADDR }}
             PARTITIONS_ADDR=${{ env.DEFAULT_PARTITIONS_ADDR }}
             BOOT_APP0_ADDR=${{ env.DEFAULT_BOOT_APP0_ADDR }}
@@ -169,19 +151,18 @@ jobs:
             SPIFFS_ADDR=${{ env.DEFAULT_SPIFFS_ADDR }}
             FLASH_SIZE=${{ env.DEFAULT_FLASH_SIZE }}
             DEVICE=${{ env.DEFAULT_DEVICE }}
+            echo "FIRMWARE_URL=$FIRMWARE_URL" >> $GITHUB_ENV
+            echo "PARTITION_URL=$PARTITION_URL" >> $GITHUB_ENV
+            echo "BOOTLOADER_URL=$BOOTLOADER_URL" >> $GITHUB_ENV
+            echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
           fi
                           
-          echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
           echo "DEVICE=$DEVICE" >> $GITHUB_ENV
           echo "BOOTLOADER_ADDR=$BOOTLOADER_ADDR" >> $GITHUB_ENV
           echo "PARTITIONS_ADDR=$PARTITIONS_ADDR" >> $GITHUB_ENV
           echo "BOOT_APP0_ADDR=$BOOT_APP0_ADDR" >> $GITHUB_ENV
           echo "FIRMWARE_ADDR=$FIRMWARE_ADDR" >> $GITHUB_ENV
           echo "SPIFFS_ADDR=$SPIFFS_ADDR" >> $GITHUB_ENV
-          echo "FIRMWARE_URL=$FIRMWARE_URL" >> $GITHUB_ENV
-          echo "PARTITION_URL=$PARTITION_URL" >> $GITHUB_ENV
-          echo "BOOTLOADER_URL=$BOOTLOADER_URL" >> $GITHUB_ENV
-          echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
           echo "FLASH_SIZE=$FLASH_SIZE" >> $GITHUB_ENV
 
       - name: 📥 Download binaries (url)
