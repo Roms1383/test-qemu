@@ -89,9 +89,16 @@ jobs:
         run: |
           cp -R ${{ env.SKETCH_FOLDER }}/build ${{ env.BUILD_ARTIFACT_FOLDER }}
           wget -q ${{ env.BOOT_APP0_URL }}  -O ${{ env.BUILD_ARTIFACT_FOLDER }}/boot_app0.bin
-          pwd
-          ls -la
-          ls ${{ env.BUILD_ARTIFACT_FOLDER }} -la
+          # normalize file names
+          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/firmware.bin
+          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.booloader.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/booloader.bin
+          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.partitions.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/partitions.bin
+          if [[ -f "${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.spiffs.bin" ]]; then
+            mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.spiffs.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/spiffs.bin
+          else
+            echo "[INFO] Creating empty SPIFFS file"
+            touch ${{ env.BUILD_ARTIFACT_FOLDER }}/spiffs.bin
+          fi
           
       - name: Upload binaries as artifact
         if: github.event_name == 'workflow_dispatch'
@@ -99,7 +106,6 @@ jobs:
         with:
           name: Build-dir
           path: ${{ env.BUILD_ARTIFACT_FOLDER }}
-          if-no-files-found: error
 
   qemu:
   
@@ -160,7 +166,6 @@ jobs:
         with:
           name: Build-dir
           path: ${{ env.BUILD_ARTIFACT_FOLDER }}
-          if-no-files-found: error
           #run: |
           #  ./bootloader.bin
           #  ./partitions.bin
@@ -221,10 +226,6 @@ jobs:
           pip install --upgrade pyserial
           if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then
             cp ./build/*.bin ./
-          fi
-          if [[ ! -f "spiffs.bin" ]]; then
-            echo "[INFO] Creating empty SPIFFS file"
-            touch spiffs.bin
           fi
                       
       - name: 📥 Checkout esptool.py
