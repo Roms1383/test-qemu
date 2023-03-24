@@ -140,7 +140,7 @@ jobs:
           echo "BOOTLOADER_URL=$BOOTLOADER_URL" >> $GITHUB_ENV
           echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
 
-      - name: 📥 Download bin artifact
+      - name: 📥 Download binaries (url)
         if: env.BASE_URL != ''
         run: |
           wget -q ${{ env.FIRMWARE_URL }}   -O firmware.bin
@@ -149,9 +149,9 @@ jobs:
           wget -q ${{ env.BOOT_APP0_URL }}  -O boot_app0.bin
           wget -q ${{ env.SPIFFS_URL }}     -O spiffs.bin
           
-      - name: 📁 Download bin artifact
+      - name: 📁 Retrieve binaries (artifact)
         if: env.BASE_URL == '' # no base URL means the binaries are already available as artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/download-artifact@v3
         with:
           name: Qemu Logs
           path: |
