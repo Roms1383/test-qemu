@@ -92,7 +92,7 @@ jobs:
           ls ${{ env.BUILD_ARTIFACT_FOLDER }}/*.bin -la
           # normalize file names
           mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/firmware.bin
-          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.booloader.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/booloader.bin
+          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.bootloader.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/bootloader.bin
           mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.partitions.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/partitions.bin
           if [[ -f "${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.spiffs.bin" ]]; then
             mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.spiffs.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/spiffs.bin
