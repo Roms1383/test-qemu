@@ -5,12 +5,16 @@ env:
   QEMU_BIN: ./qemu-git/build/qemu-system-xtensa
   ESPTOOL: ./esptool/esptool.py
   BOOT_APP0_URL: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
+  ARDUINO_PLATFORM_URL: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json
+  ARDUINO_ESP32_VERSION: 2.0.7
+  SKETCH_FOLDER: examples/test
+  SKETCH_NAME: test.ino
+  DEFAULT_DEVICE: esp32
   DEFAULT_BOOTLOADER_ADDR: "0x1000"
   DEFAULT_PARTITIONS_ADDR: "0x8000"
   DEFAULT_BOOT_APP0_ADDR: "0xe000"
   DEFAULT_FIRMWARE_ADDR: "0x10000"
   DEFAULT_SPIFFS_ADDR: "0x290000"
-  DEFAULT_DEVICE: esp32
   FLASH_SIZE: 4MB
   QEMU_TIMEOUT: 60 # seconds
 
@@ -29,10 +33,10 @@ on:
         - esp32c3
       BASE_URL: 
         description: "URL Prefix for binaries"
-        default: "https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz"
+        default: ""
       BOOT_APP0_URL:
         description: "boot_app0 URL"
-        default: https://github.com/espressif/arduino-esp32/raw/master/tools/partitions/boot_app0.bin
+        default: ""
       BOOTLOADER_ADDR:
         description: "Bootloader Address"
         default: "0x1000"
@@ -56,9 +60,46 @@ on:
         default: "60"
 
 jobs:
+
+  buildsketch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Compile sketch
+        if: github.event_name == 'workflow_dispatch'
+        uses: ArminJo/arduino-test-compile@v3.2.0
+        with:
+          platform-url: ${{ env.ARDUINO_PLATFORM_URL }}
+          arduino-board-fqbn: esp32:esp32:${{ env.DEFAULT_DEVICE }}
+          arduino-platform: esp32:esp32@${{ env.ARDUINO_ESP32_VERSION }}
+          #required-libraries: ${{ matrix.required-libraries }}
+          extra-arduino-lib-install-args: --no-deps
+          extra-arduino-cli-args: "--warnings default " # see https://github.com/ArminJo/arduino-test-compile/issues/28
+          sketch-names: ${{ env.SKETCH_NAME }}/${{ env.SKETCH_NAME }}
+          set-build-path: true
+          #build-properties: ${{ toJson(matrix.build-properties) }}
+          #debug-install: true
+      - name: Copy compiled binaries
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cp -R ${{ env.SKETCH_NAME }}/build ./build
+      - name: Upload binaries as artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Build dir
+          path: |
+            './build'
+
+
   qemu:
   
     runs-on: ubuntu-latest
+    needs: buildsketch
     steps:
 
       - name: Guess Context
@@ -98,12 +139,25 @@ jobs:
           echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
 
       - name: 📥 Download bin artifact
+        if: github.event.inputs.BASE_URL != '' 
         run: |
           wget -q ${{ env.FIRMWARE_URL }}   -O firmware.bin
           wget -q ${{ env.BOOTLOADER_URL }} -O bootloader.bin
           wget -q ${{ env.PARTITION_URL }}  -O partitions.bin
           wget -q ${{ env.BOOT_APP0_URL }}  -O boot_app0.bin
           wget -q ${{ env.SPIFFS_URL }}     -O spiffs.bin
+          
+      - name: 📁 Download bin artifact
+        if: env.BASE_URL == '' # no base URL means the binaries are already available as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Qemu Logs
+          path: |
+            ./firmware.bin
+            ./bootloader.bin
+            ./partitions.bin
+            ./boot_app0.bin
+            ./spiffs.bin
 
       - name: 🛅 Cache QEmu build
         uses: actions/cache@v3
