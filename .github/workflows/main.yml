@@ -30,9 +30,9 @@ on:
         default: esp32
         options:
         - esp32
-        - esp32s2
-        - esp32s3
-        - esp32c3
+        - esp32s2 # not supported yed
+        - esp32c3 # not supported yed
+        - esp32s3 # not supported yed
       FLASH_SIZE:
         type: choice
         description: "Flash Size (MB)"
@@ -107,8 +107,8 @@ jobs:
             echo "[INFO] Creating empty SPIFFS file"
             touch ${{ env.BUILD_ARTIFACT_FOLDER }}/spiffs.bin
           fi
-          
-          
+          # TODO: open build/partitions.csv and update *_ADDR env vars
+          cat ${{ env.BUILD_ARTIFACT_FOLDER }}/partitions.csv
           
       - name: Upload binaries as artifact
         if: github.event_name == 'workflow_dispatch'
@@ -129,11 +129,24 @@ jobs:
             BASE_URL=${{ github.event.inputs.BASE_URL }}
             BOOTLOADER_ADDR=${{ github.event.inputs.BOOTLOADER_ADDR }}
             PARTITIONS_ADDR=${{ github.event.inputs.PARTITIONS_ADDR }}
-            BOOT_APP0_ADDR=${{ github.event.inputs.BOOT_APP0_ADDR }}
-            FIRMWARE_ADDR=${{ github.event.inputs.FIRMWARE_ADDR }}
-            SPIFFS_ADDR=${{ github.event.inputs.SPIFFS_ADDR }}
             DEVICE=${{ github.event.inputs.DEVICE }}
             FLASH_SIZE=${{ github.event.inputs.FLASH_SIZE }}
+            OLD_IFS=$IFS
+            csvdata=`cat partitions.csv | tr -d ' ' | tr '\n' ';'` # remove spaces, replace \n by semicolon
+            IFS=';' read -ra rows <<< "$csvdata" # split lines
+            for index in "${!rows[@]}"
+            do
+              IFS=',' read -ra csv_columns <<< "${rows[$index]}" # split columns
+              case "${csv_columns[0]}" in
+                otadata)  BOOT_APP0_ADDR="${csv_columns[3]}" ;;
+                app0)     FIRMWARE_ADDR="${csv_columns[3]}"  ;;
+                spiffs)   SPIFFS_ADDR="${csv_columns[3]}"    ;;
+                coredump) COREDUMP_ADDR="${csv_columns[3]}"  ;;
+              esac
+            done
+            ( set -o posix ; set ) | grep _ADDR
+            IFS=$OLD_IFS
+            
           else
             BASE_URL=${{ env.DEFAULT_BASE_URL }}
             FIRMWARE_URL=$BASE_URL.ino.bin
