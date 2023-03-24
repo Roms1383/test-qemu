@@ -89,6 +89,7 @@ jobs:
         run: |
           cp -R ${{ env.SKETCH_FOLDER }}/build ${{ env.BUILD_ARTIFACT_FOLDER }}
           wget -q ${{ env.BOOT_APP0_URL }}  -O ${{ env.BUILD_ARTIFACT_FOLDER }}/boot_app0.bin
+          ls ${{ env.BUILD_ARTIFACT_FOLDER }}/*.bin -la
           # normalize file names
           mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/firmware.bin
           mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.booloader.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/booloader.bin
