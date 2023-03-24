@@ -241,7 +241,7 @@ jobs:
    
       - name: 🏭 Create firmware for QEmu
         run: |
-          ${{ env.ESPTOOL }} --chip esp32 merge_bin --fill-flash-size ${{ env.FLASH_SIZE }}MB -o flash_image.bin \
+          ${{ env.ESPTOOL }} --chip ${{ env.DEVICE }} merge_bin --fill-flash-size ${{ env.FLASH_SIZE }}MB -o flash_image.bin \
             ${{ env.BOOTLOADER_ADDR }} bootloader.bin \
             ${{ env.PARTITIONS_ADDR }} partitions.bin \
             ${{ env.BOOT_APP0_ADDR }}  boot_app0.bin \
@@ -251,7 +251,7 @@ jobs:
       - name: 🕹️ Load firmware in QEmu
         # qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=firmware.bin,if=mtd,format=raw
         run: |
-          (${{ env.QEMU_BIN }} -nographic -machine ${{ env.DEVICE }} -drive file=flash_image.bin,if=mtd,format=raw | tee -a ./logs.txt) &
+          (${{ env.QEMU_BIN }} -nographic -machine esp32 -drive file=flash_image.bin,if=mtd,format=raw | tee -a ./logs.txt) &
           sleep ${{ env.QEMU_TIMEOUT }}
           killall qemu-system-xtensa || true
           
