@@ -131,6 +131,7 @@ jobs:
             PARTITIONS_ADDR=${{ github.event.inputs.PARTITIONS_ADDR }}
             DEVICE=${{ github.event.inputs.DEVICE }}
             FLASH_SIZE=${{ github.event.inputs.FLASH_SIZE }}
+            cat partitions.csv
             OLD_IFS=$IFS
             csvdata=`cat partitions.csv | tr -d ' ' | tr '\n' ';'` # remove spaces, replace \n by semicolon
             IFS=';' read -ra rows <<< "$csvdata" # split lines
