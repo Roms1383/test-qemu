@@ -219,7 +219,7 @@ jobs:
           if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then
             cp ./build/*.bin ./
           fi
-          if [[ !-f "spiffs.bin ]]; then
+          if [[ !-f "spiffs.bin" ]]; then
             echo "[INFO] Creating empty SPIFFS file"
             touch spiffs.bin
           fi
