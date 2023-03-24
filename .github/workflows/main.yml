@@ -87,6 +87,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           cp -R ${{ env.SKETCH_NAME }}/build ./build
+          wget -q ${{ env.BOOT_APP0_URL }}  -O ./build/boot_app0.bin
+          
       - name: Upload binaries as artifact
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v3
@@ -153,13 +155,15 @@ jobs:
         if: env.BASE_URL == '' # no base URL means the binaries are already available as artifacts
         uses: actions/download-artifact@v3
         with:
-          name: Qemu Logs
+          name: Build dir
           path: |
-            ./firmware.bin
-            ./bootloader.bin
-            ./partitions.bin
-            ./boot_app0.bin
-            ./spiffs.bin
+            './build'
+          #run: |
+          #  ./bootloader.bin
+          #  ./partitions.bin
+          #  ./firmware.bin
+          #  ./boot_app0.bin
+          #  ./spiffs.bin
 
       - name: 🛅 Cache QEmu build
         uses: actions/cache@v3
