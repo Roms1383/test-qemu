@@ -11,12 +11,13 @@ env:
   SKETCH_FOLDER: examples/test
   SKETCH_NAME: test.ino
   DEFAULT_DEVICE: esp32
+  DEFAULT_BASE_URL: https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz
   DEFAULT_BOOTLOADER_ADDR: "0x1000"
   DEFAULT_PARTITIONS_ADDR: "0x8000"
   DEFAULT_BOOT_APP0_ADDR: "0xe000"
   DEFAULT_FIRMWARE_ADDR: "0x10000"
   DEFAULT_SPIFFS_ADDR: "0x290000"
-  FLASH_SIZE: 4MB
+  DEFAULT_FLASH_SIZE: 4
   QEMU_TIMEOUT: 60 # seconds
 
 on: 
@@ -32,6 +33,15 @@ on:
         - esp32s2
         - esp32s3
         - esp32c3
+      FLASH_SIZE:
+        type: choice
+        description: "Flash Size (MB)"
+        default: "4"
+        options:
+        - "2"
+        - "4"
+        - "8"
+        - "16"
       BASE_URL: 
         description: "URL Prefix for binaries"
         default: ""
@@ -53,9 +63,6 @@ on:
       SPIFFS_ADDR:
         description: "SPIFFS Address"
         default: "0x290000"
-      FLASH_SIZE:
-        description: "Flash Size"
-        default: "4MB"
       QEMU_TIMEOUT:
         description: "QEmu timeout"
         default: "60"
@@ -75,7 +82,7 @@ jobs:
         uses: ArminJo/arduino-test-compile@v3.2.0
         with:
           platform-url: ${{ env.ARDUINO_PLATFORM_URL }}
-          arduino-board-fqbn: esp32:esp32:${{ env.DEFAULT_DEVICE }}:FlashMode=dio,FlashFreq=80,FlashSize=4M
+          arduino-board-fqbn: esp32:esp32:${{ env.DEFAULT_DEVICE }}:FlashMode=dio,FlashFreq=80,FlashSize=${{ github.event.inputs.FLASH_SIZE }}M
           arduino-platform: esp32:esp32@${{ env.ARDUINO_ESP32_VERSION }}
           #required-libraries: ${{ matrix.required-libraries }}
           extra-arduino-lib-install-args: --no-deps
@@ -101,6 +108,8 @@ jobs:
             touch ${{ env.BUILD_ARTIFACT_FOLDER }}/spiffs.bin
           fi
           
+          
+          
       - name: Upload binaries as artifact
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v3
@@ -124,22 +133,22 @@ jobs:
             FIRMWARE_ADDR=${{ github.event.inputs.FIRMWARE_ADDR }}
             SPIFFS_ADDR=${{ github.event.inputs.SPIFFS_ADDR }}
             DEVICE=${{ github.event.inputs.DEVICE }}
+            FLASH_SIZE=${{ github.event.inputs.FLASH_SIZE }}
           else
-            BASE_URL=https://github.com/Roms1383/test-qemu/raw/main/.github/workflows/Test_tar_gz_tgz
-            BOOTLOADER_ADDR=$DEFAULT_BOOTLOADER_ADDR
-            PARTITIONS_ADDR=$DEFAULT_PARTITIONS_ADDR
-            BOOT_APP0_ADDR=$DEFAULT_BOOT_APP0_ADDR
-            FIRMWARE_ADDR=$DEFAULT_FIRMWARE_ADDR
-            SPIFFS_ADDR=$DEFAULT_SPIFFS_ADDR
-            DEVICE=$DEFAULT_DEVICE
+            BASE_URL=${{ env.DEFAULT_BASE_URL }}
+            FIRMWARE_URL=$BASE_URL.ino.bin
+            PARTITION_URL=$BASE_URL.ino.partitions.bin
+            BOOTLOADER_URL=$BASE_URL.ino.bootloader.bin
+            SPIFFS_URL=$BASE_URL.spiffs.bin
+            BOOTLOADER_ADDR=${{ env.DEFAULT_BOOTLOADER_ADDR }}
+            PARTITIONS_ADDR=${{ env.DEFAULT_PARTITIONS_ADDR }}
+            BOOT_APP0_ADDR=${{ env.DEFAULT_BOOT_APP0_ADDR }}
+            FIRMWARE_ADDR=${{ env.DEFAULT_FIRMWARE_ADDR }}
+            SPIFFS_ADDR=${{ env.DEFAULT_SPIFFS_ADDR }}
+            FLASH_SIZE=${{ env.DEFAULT_FLASH_SIZE }}
+            DEVICE=${{ env.DEFAULT_DEVICE }}
           fi
-          
-          FIRMWARE_URL=$BASE_URL.ino.bin
-          PARTITION_URL=$BASE_URL.ino.partitions.bin
-          BOOTLOADER_URL=$BASE_URL.ino.bootloader.bin
-          SPIFFS_URL=$BASE_URL.spiffs.bin
-        
-        
+                          
           echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
           echo "DEVICE=$DEVICE" >> $GITHUB_ENV
           echo "BOOTLOADER_ADDR=$BOOTLOADER_ADDR" >> $GITHUB_ENV
@@ -151,6 +160,7 @@ jobs:
           echo "PARTITION_URL=$PARTITION_URL" >> $GITHUB_ENV
           echo "BOOTLOADER_URL=$BOOTLOADER_URL" >> $GITHUB_ENV
           echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
+          echo "FLASH_SIZE=$FLASH_SIZE" >> $GITHUB_ENV
 
       - name: 📥 Download binaries (url)
         if: github.event_name != 'workflow_dispatch'
@@ -167,12 +177,6 @@ jobs:
         with:
           name: Build-dir
           path: ${{ env.BUILD_ARTIFACT_FOLDER }}
-          #run: |
-          #  ./bootloader.bin
-          #  ./partitions.bin
-          #  ./firmware.bin
-          #  ./boot_app0.bin
-          #  ./spiffs.bin
 
       - name: 🛅 Cache QEmu build
         uses: actions/cache@v3
@@ -237,7 +241,7 @@ jobs:
    
       - name: 🏭 Create firmware for QEmu
         run: |
-          ${{ env.ESPTOOL }} --chip ${{ env.DEVICE }} merge_bin --fill-flash-size ${{ env.FLASH_SIZE }} -o flash_image.bin \
+          ${{ env.ESPTOOL }} --chip ${{ env.DEVICE }} merge_bin --fill-flash-size ${{ env.FLASH_SIZE }}MB -o flash_image.bin \
             ${{ env.BOOTLOADER_ADDR }} bootloader.bin \
             ${{ env.PARTITIONS_ADDR }} partitions.bin \
             ${{ env.BOOT_APP0_ADDR }}  boot_app0.bin \
