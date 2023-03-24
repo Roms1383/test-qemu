@@ -139,7 +139,7 @@ jobs:
           echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
 
       - name: 📥 Download bin artifact
-        if: github.event.inputs.BASE_URL != '' 
+        if: env.BASE_URL != ''
         run: |
           wget -q ${{ env.FIRMWARE_URL }}   -O firmware.bin
           wget -q ${{ env.BOOTLOADER_URL }} -O bootloader.bin
