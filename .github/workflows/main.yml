@@ -241,7 +241,7 @@ jobs:
    
       - name: 🏭 Create firmware for QEmu
         run: |
-          ${{ env.ESPTOOL }} --chip ${{ env.DEVICE }} merge_bin --fill-flash-size ${{ env.FLASH_SIZE }}MB -o flash_image.bin \
+          ${{ env.ESPTOOL }} --chip esp32 merge_bin --fill-flash-size ${{ env.FLASH_SIZE }}MB -o flash_image.bin \
             ${{ env.BOOTLOADER_ADDR }} bootloader.bin \
             ${{ env.PARTITIONS_ADDR }} partitions.bin \
             ${{ env.BOOT_APP0_ADDR }}  boot_app0.bin \
