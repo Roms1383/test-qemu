@@ -175,7 +175,13 @@ jobs:
       - name: 🕹️ Load firmware in QEmu
         # qemu-system-xtensa -nographic -no-reboot -machine esp32 -drive file=firmware.bin,if=mtd,format=raw
         run: |
-          (${{ env.QEMU_BIN }} -nographic -machine ${{ env.DEVICE }} -drive file=flash_image.bin,if=mtd,format=raw) &
+          (${{ env.QEMU_BIN }} -nographic -machine ${{ env.DEVICE }} -drive file=flash_image.bin,if=mtd,format=raw | tee -a ./logs.txt) &
           sleep ${{ env.QEMU_TIMEOUT }}
           killall qemu-system-xtensa || true
           
+      - name: Upload logs as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Qemu Logs
+          path: |
+            ./logs.txt
