@@ -122,7 +122,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: buildsketch
     steps:
-
+    
+      - name: 📁 Retrieve binaries (artifact)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/download-artifact@v3
+        with:
+          name: Build-dir
+          path: ${{ env.BUILD_ARTIFACT_FOLDER }}
+    
       - name: Guess Context
         run: |
           if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then
@@ -131,9 +138,9 @@ jobs:
             PARTITIONS_ADDR=${{ github.event.inputs.PARTITIONS_ADDR }}
             DEVICE=${{ github.event.inputs.DEVICE }}
             FLASH_SIZE=${{ github.event.inputs.FLASH_SIZE }}
-            cat partitions.csv
+            cat ${{ env.BUILD_ARTIFACT_FOLDER }}/partitions.csv
             OLD_IFS=$IFS
-            csvdata=`cat partitions.csv | tr -d ' ' | tr '\n' ';'` # remove spaces, replace \n by semicolon
+            csvdata=`cat ${{ env.BUILD_ARTIFACT_FOLDER }}/partitions.csv | tr -d ' ' | tr '\n' ';'` # remove spaces, replace \n by semicolon
             IFS=';' read -ra rows <<< "$csvdata" # split lines
             for index in "${!rows[@]}"
             do
@@ -143,6 +150,7 @@ jobs:
                 app0)     FIRMWARE_ADDR="${csv_columns[3]}"  ;;
                 spiffs)   SPIFFS_ADDR="${csv_columns[3]}"    ;;
                 coredump) COREDUMP_ADDR="${csv_columns[3]}"  ;;
+                *) echo "Ignoring ${csv_columns[0]}:${csv_columns[3]}" ;;
               esac
             done
             ( set -o posix ; set ) | grep _ADDR
@@ -185,13 +193,6 @@ jobs:
           wget -q ${{ env.BOOT_APP0_URL }}  -O boot_app0.bin
           wget -q ${{ env.SPIFFS_URL }}     -O spiffs.bin
           
-      - name: 📁 Retrieve binaries (artifact)
-        if: github.event_name == 'workflow_dispatch'
-        uses: actions/download-artifact@v3
-        with:
-          name: Build-dir
-          path: ${{ env.BUILD_ARTIFACT_FOLDER }}
-
       - name: 🛅 Cache QEmu build
         uses: actions/cache@v3
         id: cache-qemu
