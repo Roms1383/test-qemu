@@ -127,6 +127,8 @@ jobs:
           BOOTLOADER_URL=$BASE_URL.ino.bootloader.bin
           SPIFFS_URL=$BASE_URL.spiffs.bin
         
+        
+          echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
           echo "DEVICE=$DEVICE" >> $GITHUB_ENV
           echo "BOOTLOADER_ADDR=$BOOTLOADER_ADDR" >> $GITHUB_ENV
           echo "PARTITIONS_ADDR=$PARTITIONS_ADDR" >> $GITHUB_ENV
