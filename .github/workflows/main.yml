@@ -90,11 +90,11 @@ jobs:
           cp -R ${{ env.SKETCH_FOLDER }}/build ${{ env.BUILD_ARTIFACT_FOLDER }}
           wget -q ${{ env.BOOT_APP0_URL }}  -O ${{ env.BUILD_ARTIFACT_FOLDER }}/boot_app0.bin
           # normalize file names
-          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/firmware.bin
-          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.booloader.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/booloader.bin
-          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.partitions.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/partitions.bin
-          if [[ -f "${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.spiffs.bin" ]]; then
-            mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.ino.spiffs.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/spiffs.bin
+          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/firmware.bin
+          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.booloader.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/booloader.bin
+          mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.partitions.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/partitions.bin
+          if [[ -f "${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.spiffs.bin" ]]; then
+            mv ${{ env.BUILD_ARTIFACT_FOLDER }}/${{ env.SKETCH_NAME }}.spiffs.bin ${{ env.BUILD_ARTIFACT_FOLDER }}/spiffs.bin
           else
             echo "[INFO] Creating empty SPIFFS file"
             touch ${{ env.BUILD_ARTIFACT_FOLDER }}/spiffs.bin
