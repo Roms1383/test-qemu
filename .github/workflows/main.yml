@@ -86,7 +86,7 @@ jobs:
       - name: Copy compiled binaries
         if: github.event_name == 'workflow_dispatch'
         run: |
-          cp -R ${{ env.SKETCH_NAME }}/build ./build
+          cp -R ${{ env.SKETCH_FOLDER }}/build ./build
           wget -q ${{ env.BOOT_APP0_URL }}  -O ./build/boot_app0.bin
           
       - name: Upload binaries as artifact
@@ -143,7 +143,7 @@ jobs:
           echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
 
       - name: 📥 Download binaries (url)
-        if: env.BASE_URL != ''
+        if: github.event_name != 'workflow_dispatch'
         run: |
           wget -q ${{ env.FIRMWARE_URL }}   -O firmware.bin
           wget -q ${{ env.BOOTLOADER_URL }} -O bootloader.bin
@@ -152,7 +152,7 @@ jobs:
           wget -q ${{ env.SPIFFS_URL }}     -O spiffs.bin
           
       - name: 📁 Retrieve binaries (artifact)
-        if: env.BASE_URL == '' # no base URL means the binaries are already available as artifacts
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/download-artifact@v3
         with:
           name: Build dir
@@ -216,6 +216,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade pyserial
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then
+            cp ./build/*.bin ./
+          fi
+          if [[ !-f "spiffs.bin ]]; then
+            echo "[INFO] Creating empty SPIFFS file"
+            touch spiffs.bin
+          fi
                       
       - name: 📥 Checkout esptool.py
         uses: actions/checkout@v3
