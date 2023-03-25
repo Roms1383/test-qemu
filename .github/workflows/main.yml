@@ -188,7 +188,7 @@ jobs:
               --disable-strip --disable-user \
               --disable-capstone --disable-vnc \
               --disable-sdl --disable-gtk
-          ninja -C build
+          ninja -C ${{ env.BUILD_ARTIFACT_FOLDER }}
 
       - name: 🪡 Setup Python 3.7
         uses: actions/setup-python@v4
@@ -208,7 +208,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade pyserial
           if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]; then
-            cp ./build/*.bin ./
+            cp ${{ env.BUILD_ARTIFACT_FOLDER }}/*.bin ./
           fi
                       
       - name: 📥 Checkout esptool.py
