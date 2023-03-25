@@ -144,8 +144,6 @@ jobs:
             BOOTLOADER_URL=${{ env.DEFAULT_BASE_URL }}.ino.bootloader.bin
             FIRMWARE_URL=${{ env.DEFAULT_BASE_URL }}.ino.bin
             SPIFFS_URL=${{ env.DEFAULT_BASE_URL }}.spiffs.bin
-            BOOTLOADER_ADDR=${{ env.DEFAULT_BOOTLOADER_ADDR }}
-            PARTITIONS_ADDR=${{ env.DEFAULT_PARTITIONS_ADDR }}
             BOOT_APP0_ADDR=${{ env.DEFAULT_BOOT_APP0_ADDR }}
             FIRMWARE_ADDR=${{ env.DEFAULT_FIRMWARE_ADDR }}
             SPIFFS_ADDR=${{ env.DEFAULT_SPIFFS_ADDR }}
@@ -156,6 +154,9 @@ jobs:
             echo "BOOTLOADER_URL=$BOOTLOADER_URL" >> $GITHUB_ENV
             echo "SPIFFS_URL=$SPIFFS_URL" >> $GITHUB_ENV
           fi
+
+          BOOTLOADER_ADDR=${{ env.DEFAULT_BOOTLOADER_ADDR }}
+          PARTITIONS_ADDR=${{ env.DEFAULT_PARTITIONS_ADDR }}
                           
           echo "DEVICE=$DEVICE" >> $GITHUB_ENV
           echo "BOOTLOADER_ADDR=$BOOTLOADER_ADDR" >> $GITHUB_ENV
